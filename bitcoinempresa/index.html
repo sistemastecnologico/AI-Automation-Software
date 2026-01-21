@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donación para Juego Interactivo - Exploración Cósmica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            background-color: #000011;
+            color: #00FFFF;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            text-align: center;
+        }
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: #FFFFFF;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, move 10s linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        @keyframes move {
+            from { transform: translateY(-100vh); }
+            to { transform: translateY(100vh); }
+        }
+        .scroll-arrow {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: #00FFFF;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+            z-index: 10;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+        .section {
+            min-height: 100vh;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1, h2 {
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF;
+        }
+        canvas {
+            border: 2px solid #00FFFF;
+            background: #000011;
+            box-shadow: 0 0 20px #00FFFF;
+        }
+        .enterprise {
+            background: linear-gradient(45deg, #001122, #000033);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            box-shadow: 0 0 20px #00FFFF;
+        }
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+        }
+        .testimonial {
+            background: #001122;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #00FFFF;
+            box-shadow: 0 0 10px #00FFFF;
+        }
+        .donation-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00FFFF;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), 0 0 40px #00FFFF, 0 0 60px #00FFFF;
+            animation: neonGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes neonGlow {
+            from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), 0 0 40px #00FFFF, 0 0 60px #00FFFF; }
+            to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1), 0 0 60px #00FFFF, 0 0 80px #00FFFF; }
+        }
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1.2em;
+            border: 2px solid #00FFFF;
+            border-radius: 5px;
+            background-color: rgba(0, 17, 34, 0.8);
+            color: #00FFFF;
+            width: 200px;
+        }
+        .donate-btn {
+            background: linear-gradient(45deg, #00FFFF, #FF00FF);
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00FFFF;
+            margin: 20px;
+            font-weight: bold;
+        }
+        .donate-btn:hover {
+            box-shadow: 0 0 30px #FF00FF;
+        }
+        .donation-info {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .copy-btn {
+            background: linear-gradient(45deg, #00FFFF, #FF00FF);
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        .copy-btn:hover {
+            box-shadow: 0 0 10px #00FFFF;
+        }
+        .proposal-btn {
+            background: linear-gradient(45deg, #FF00FF, #00FFFF);
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        .proposal-btn:hover {
+            box-shadow: 0 0 10px #FF00FF;
+        }
+        .qr-code img {
+            border-radius: 10px;
+        }
+        .footer {
+            padding: 20px;
+            background: #000033;
+        }
+        @media (max-width: 768px) {
+            .section {
+                padding: 20px;
+            }
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="scroll-arrow" onclick="scrollToNext()">↓</div>
+
+    <div class="section" id="intro">
+        <h1>🚀 Donación para Juego Interactivo</h1>
+        <p>Financia la Exploración Cósmica y Ayuda a Crear un Juego Épico</p>
+    </div>
+
+    <div class="section" id="game">
+        <h2>Misión Espacial 3D Interactiva</h2>
+        <p>Explora el universo low-poly. El astronauta flota en el centro, planetas con profundidad.</p>
+        <div id="threejs-container" style="width: 800px; height: 400px;"></div>
+        <div id="controls" style="position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 10px; font-size: 14px; border-radius: 5px;">
+            <strong>Controles del Juego:</strong><br>
+            WASD o Flechas: Mover Astronauta<br>
+            Espacio: Disparar Proyectiles<br>
+            B (al aterrizar): Colocar Base<br>
+            ¡Destruye Aliens y Explora!
+        </div>
+        <div id="score" style="position: absolute; top: 10px; right: 10px; color: yellow; font-size: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px;">
+            Puntuación: 0
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="enterprise">
+            <h2>Soluciones Tecnológicas e Innovación Espacial</h2>
+            <p>Este proyecto representa la vanguardia en escalabilidad y sistemas interactivos. Desarrollamos soluciones tecnológicas avanzadas que integran IA, blockchain y experiencias inmersivas para empresas globales. Nuestra visión combina innovación técnica con impacto real, creando plataformas que escalan a nivel empresarial mientras mantienen una experiencia de usuario excepcional.</p>
+            <p>Las empresas líderes confían en nosotros para proyectos de alta complejidad, desde juegos interactivos hasta sistemas de gestión distribuida.</p>
+            <p>¡Agradecemos con felicidad cualquier donación en Bitcoin que nos ayude a continuar innovando! 😊</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Testimonios de la Comunidad</h2>
+        <div class="testimonials">
+            <div class="testimonial">
+                <p>"Increíble interfaz que combina tecnología y creatividad de manera perfecta."</p>
+                <cite>- Desarrollador Senior, TechCorp</cite>
+            </div>
+            <div class="testimonial">
+                <p>"Gran potencial técnico, ideal para proyectos empresariales de gran escala."</p>
+                <cite>- CTO, Innovate Solutions</cite>
+            </div>
+            <div class="testimonial">
+                <p>"La experiencia inmersiva redefine cómo pensamos en aplicaciones interactivas."</p>
+                <cite>- Ingeniero de Software, GlobalTech</cite>
+            </div>
+            <div class="testimonial">
+                <p>"Un ejemplo brillante de innovación en el desarrollo de juegos y sistemas."</p>
+                <cite>- Director de Producto, FutureApps</cite>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="donation-section">
+            <h2>Inversión en Desarrollo</h2>
+            <p>Apoya esta visión tecnológica con una inversión en Bitcoin. Tu contribución acelera el desarrollo de soluciones innovadoras.</p>
+            <div>
+                <label for="amount">Cantidad BTC:</label><br>
+                <input type="number" id="amount" min="0.00001" max="1" step="0.00001" value="0.0001">
+            </div>
+            <button class="donate-btn" onclick="showDonationInfo()">Invertir Ahora</button>
+            <div class="donation-info" id="donationInfo">
+                <p>Envía <span id="selectedAmount">0.0001</span> BTC a:</p>
+                <div class="address">bc1qsvv0tfcxwljt0paj84wm4xztr48qmv88umsyug</div>
+                <button class="copy-btn" onclick="copyAddress()">Copiar Dirección</button>
+                <div class="qr-code">
+                    <img id="qrCode" src="" alt="Código QR para inversión">
+                </div>
+                <p>Escanea con tu wallet Bitcoin</p>
+                <button class="proposal-btn" onclick="openProposal()">Enviar Propuesta</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Cosmic Game Dev. Busca "donacion juego" para este link.</p>
+    </div>
+
+    <script>
+        console.log('Página cargada correctamente');
+        // Estrellas dinámicas
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = Math.random() * 4 + 1 + 'px';
+            star.style.animationDelay = Math.random() * 10 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Scroll suave
+        function scrollToNext() {
+            const sections = document.querySelectorAll('.section');
+            const current = window.scrollY;
+            for (let section of sections) {
+                if (section.offsetTop > current + 100) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    break;
+                }
+            }
+        }
+
+        // Three.js 3D Scene
+        const container = document.getElementById('threejs-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x000011, 10, 50); // Efecto de niebla para fondo infinito
+        const camera = new THREE.PerspectiveCamera(75, 800 / 400, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(800, 400);
+        renderer.setClearColor(0x000011, 0);
+        container.appendChild(renderer.domElement);
+
+        // Controles de órbita para que el usuario pueda elegir su perfil y explorar
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = true;
+        controls.enablePan = false;
+
+        // Luces Espaciales
+        const pointLight = new THREE.PointLight(0x00FFFF, 1, 100); // Luz puntual azul neón
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0x0000FF, 0.3);
+        scene.add(ambientLight);
+
+        // Astronauta Realista (Mesh sólido con Standard Material) - Forma Humana Completa
+        const astronaut = new THREE.Group();
+
+        // Cabeza (esfera blanca brillante)
+        const headGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+        const headMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.8, roughness: 0.2 });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 1.8;
+        astronaut.add(head);
+
+        // Cuerpo (cilindro blanco brillante)
+        const bodyGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.8, 32);
+        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.8, roughness: 0.2 });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 1.0;
+        astronaut.add(body);
+
+        // Brazos (cilindros)
+        const armGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.6, 16);
+        const armMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.8, roughness: 0.2 });
+        const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+        leftArm.position.set(-0.35, 1.2, 0);
+        leftArm.rotation.z = Math.PI / 6;
+        astronaut.add(leftArm);
+
+        const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+        rightArm.position.set(0.35, 1.2, 0);
+        rightArm.rotation.z = -Math.PI / 6;
+        astronaut.add(rightArm);
+
+        // Piernas (cilindros)
+        const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.7, 16);
+        const legMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.8, roughness: 0.2 });
+        const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+        leftLeg.position.set(-0.15, 0.2, 0);
+        astronaut.add(leftLeg);
+
+        const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+        rightLeg.position.set(0.15, 0.2, 0);
+        astronaut.add(rightLeg);
+
+        astronaut.position.set(0, 0, 0);
+        scene.add(astronaut);
+
+        // Texto 3D flotante: "Donar por favor para explorar el espacio"
+        const loader = new THREE.FontLoader();
+        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+            const textGeometry = new THREE.TextGeometry('Donar por favor\npara explorar el espacio', {
+                font: font,
+                size: 0.1,
+                height: 0.02,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 0.005,
+                bevelSize: 0.005,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+            const textMaterial = new THREE.MeshStandardMaterial({ color: 0x00FFFF });
+            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            textMesh.position.set(-1, 2.5, 0);
+            astronaut.add(textMesh);
+        });
+
+        // Cohete en un planeta
+        const rocket = new THREE.Group();
+
+        // Cuerpo del cohete (cilindro)
+        const rocketBodyGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
+        const rocketBodyMaterial = new THREE.MeshStandardMaterial({ color: 0xFF4500, metalness: 0.5, roughness: 0.5 });
+        const rocketBody = new THREE.Mesh(rocketBodyGeometry, rocketBodyMaterial);
+        rocketBody.position.y = 0.5;
+        rocket.add(rocketBody);
+
+        // Punta del cohete (cono)
+        const rocketTipGeometry = new THREE.ConeGeometry(0.1, 0.3, 16);
+        const rocketTipMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.8, roughness: 0.2 });
+        const rocketTip = new THREE.Mesh(rocketTipGeometry, rocketTipMaterial);
+        rocketTip.position.y = 1.15;
+        rocket.add(rocketTip);
+
+        // Alas (planos)
+        const wingGeometry = new THREE.PlaneGeometry(0.4, 0.1);
+        const wingMaterial = new THREE.MeshStandardMaterial({ color: 0xFF4500, side: THREE.DoubleSide });
+        const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+        leftWing.position.set(-0.2, 0.3, 0);
+        leftWing.rotation.y = Math.PI / 2;
+        rocket.add(leftWing);
+
+        const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+        rightWing.position.set(0.2, 0.3, 0);
+        rightWing.rotation.y = Math.PI / 2;
+        rocket.add(rightWing);
+
+        rocket.position.set(3, -1, -5);
+        scene.add(rocket);
+
+        // Planetas (esferas sólidas con Standard Material y colores brillantes)
+        const planets = [];
+        const planetData = [
+            { x: 5, y: 2, z: -10, color: 0x00FF00, size: 1 },
+            { x: -5, y: -2, z: -15, color: 0xFFFF00, size: 0.8 },
+            { x: 8, y: 0, z: -20, color: 0xFF00FF, size: 1.2 }
+        ];
+        planetData.forEach(data => {
+            const geometry = new THREE.SphereGeometry(data.size, 32, 32);
+            const material = new THREE.MeshStandardMaterial({ color: data.color, metalness: 0.1, roughness: 0.8 });
+            const planet = new THREE.Mesh(geometry, material);
+            planet.position.set(data.x, data.y, data.z);
+            scene.add(planet);
+            planets.push(planet);
+        });
+
+        // Alienígenas Exploradores de Júpiter (amarillo neón, movimiento errático)
+        const explorers = [];
+        for (let i = 0; i < 3; i++) {
+            const geometry = new THREE.SphereGeometry(0.15, 16, 16);
+            const material = new THREE.MeshStandardMaterial({ color: 0xFFFF00, emissive: 0xFFFF00, emissiveIntensity: 0.5 });
+            const alien = new THREE.Mesh(geometry, material);
+            alien.position.set(planetData[1].x + (Math.random() - 0.5) * 2, planetData[1].y + (Math.random() - 0.5) * 2, planetData[1].z + (Math.random() - 0.5) * 2);
+            scene.add(alien);
+            explorers.push(alien);
+        }
+
+        // Alienígenas de Galaxias Pro (rojos, persiguen al astronauta)
+        const hunters = [];
+        for (let i = 0; i < 2; i++) {
+            const geometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, emissive: 0xFF0000, emissiveIntensity: 0.3 });
+            const alien = new THREE.Mesh(geometry, material);
+            alien.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, -25);
+            scene.add(alien);
+            hunters.push(alien);
+        }
+
+        // Fondo de Estrellas (partículas con titileo)
+        const starGeometry = new THREE.BufferGeometry();
+        const starCount = 2000;
+        const positions = new Float32Array(starCount * 3);
+        const sizes = new Float32Array(starCount);
+        for (let i = 0; i < starCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 200;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+            sizes[i] = Math.random() * 0.5 + 0.1;
+        }
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        const starMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                attribute float size;
+                varying float vSize;
+                void main() {
+                    vSize = size;
+                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    gl_PointSize = size * (300.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                varying float vSize;
+                uniform float time;
+                void main() {
+                    float twinkle = sin(time * 2.0 + gl_FragCoord.x * 0.01) * 0.5 + 0.5;
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, twinkle * 0.8);
+                }
+            `,
+            transparent: true
+        });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+        // Controles del astronauta
+        let keys = {};
+        let velocity = new THREE.Vector3();
+        let projectiles = [];
+        let speed = 0.1;
+        let landed = false;
+        let currentPlanet = null;
+        let score = 0;
+
+        document.addEventListener('keydown', (event) => {
+            keys[event.code] = true;
+            if (event.code === 'Space') {
+                // Disparar proyectil
+                const projectileGeometry = new THREE.SphereGeometry(0.05);
+                const projectileMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, emissive: 0x440000});
+                const projectile = new THREE.Mesh(projectileGeometry, projectileMaterial);
+                projectile.position.copy(astronaut.position);
+                projectile.velocity = new THREE.Vector3(0, 0, -0.5); // Hacia adelante
+                projectiles.push(projectile);
+                scene.add(projectile);
+                event.preventDefault();
+            }
+            if (event.code === 'KeyB' && landed) {
+                // Colocar base
+                const baseGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const baseMaterial = new THREE.MeshStandardMaterial({color: 0x00ff00, emissive: 0x004400});
+                const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                base.position.copy(astronaut.position);
+                base.position.y -= 1; // Debajo del astronauta
+                scene.add(base);
+                console.log('Base colocada en ' + currentPlanet.name);
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            keys[event.code] = false;
+        });
+
+        camera.position.z = 5;
+
+        // Animación
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Movimiento del astronauta
+            velocity.set(0, 0, 0);
+            if (keys['KeyW'] || keys['ArrowUp']) velocity.z -= speed;
+            if (keys['KeyS'] || keys['ArrowDown']) velocity.z += speed;
+            if (keys['KeyA'] || keys['ArrowLeft']) velocity.x -= speed;
+            if (keys['KeyD'] || keys['ArrowRight']) velocity.x += speed;
+
+            // Astronauta flotando si no se mueve, o moviéndose
+            if (velocity.length() === 0) {
+                astronaut.position.x = Math.sin(time * 0.5) * 2;
+                astronaut.position.y = Math.cos(time * 0.3) * 1 + 1;
+                astronaut.position.z = Math.sin(time * 0.4) * 1;
+            } else {
+                astronaut.position.add(velocity);
+                astronaut.position.y = Math.cos(time * 0.3) * 1 + 1;
+            }
+            astronaut.rotation.y += 0.01;
+
+            // Mantener dentro de límites
+            astronaut.position.x = Math.max(-10, Math.min(10, astronaut.position.x));
+            astronaut.position.z = Math.max(-10, Math.min(10, astronaut.position.z));
+
+            // Verificar aterrizaje en planetas
+            landed = false;
+            currentPlanet = null;
+            planets.forEach((planet, index) => {
+                const distance = astronaut.position.distanceTo(planet.position);
+                if (distance < 2) {
+                    landed = true;
+                    currentPlanet = planetData[index];
+                    astronaut.position.y = planet.position.y + 1.5;
+                }
+            });
+
+            // Animación de brazos y piernas para simular movimiento humano
+            leftArm.rotation.x = Math.sin(time * 2) * 0.5;
+            rightArm.rotation.x = Math.sin(time * 2 + Math.PI) * 0.5;
+            leftLeg.rotation.x = Math.sin(time * 2) * 0.3;
+            rightLeg.rotation.x = Math.sin(time * 2 + Math.PI) * 0.3;
+
+            // Cohete en el planeta, con ligera rotación
+            rocket.rotation.y += 0.005;
+            rocket.position.y = -1 + Math.sin(time) * 0.1; // Flotando ligeramente
+
+            // Planetas rotando y orbitando
+            planets.forEach((planet, index) => {
+                planet.rotation.x += 0.01;
+                planet.rotation.y += 0.01;
+                planet.position.x += Math.sin(time + index) * 0.01;
+                planet.position.y += Math.cos(time + index) * 0.01;
+                const scrollY = window.scrollY;
+                planet.position.z = planetData[index].z + scrollY * 0.01;
+            });
+
+            // Estrellas titilando
+            starMaterial.uniforms.time.value = time;
+
+            // Exploradores alienígenas: movimiento errático alrededor de Júpiter
+            explorers.forEach((explorer, index) => {
+                explorer.position.x = Math.sin(time * 0.5 + index * 2) * 3 + planets[1].position.x; // Alrededor de Júpiter
+                explorer.position.y = Math.cos(time * 0.7 + index * 2) * 2 + planets[1].position.y;
+                explorer.position.z = Math.sin(time * 0.3 + index * 2) * 1 + planets[1].position.z;
+                explorer.rotation.x += 0.02;
+                explorer.rotation.y += 0.02;
+            });
+
+            // Cazadores alienígenas: persiguiendo al astronauta
+            hunters.forEach((hunter, index) => {
+                const direction = new THREE.Vector3().subVectors(astronaut.position, hunter.position).normalize();
+                hunter.position.add(direction.multiplyScalar(0.01));
+                hunter.lookAt(astronaut.position);
+                hunter.rotation.x += 0.01;
+            });
+
+            // Actualizar proyectiles
+            projectiles.forEach((projectile, index) => {
+                projectile.position.add(projectile.velocity);
+                // Remover si fuera de vista
+                if (projectile.position.z < -20 || projectile.position.x < -20 || projectile.position.x > 20) {
+                    scene.remove(projectile);
+                    projectiles.splice(index, 1);
+                }
+            });
+
+            // Colisión proyectiles con aliens
+            explorers.forEach((explorer, eIndex) => {
+                projectiles.forEach((projectile, pIndex) => {
+                    if (explorer.position.distanceTo(projectile.position) < 0.5) {
+                        scene.remove(explorer);
+                        scene.remove(projectile);
+                        explorers.splice(eIndex, 1);
+                        projectiles.splice(pIndex, 1);
+                        score += 10;
+                        document.getElementById('score').innerText = 'Puntuación: ' + score;
+                        console.log('Alien explorador destruido! Puntuación: ' + score);
+                    }
+                });
+            });
+            hunters.forEach((hunter, hIndex) => {
+                projectiles.forEach((projectile, pIndex) => {
+                    if (hunter.position.distanceTo(projectile.position) < 0.5) {
+                        scene.remove(hunter);
+                        scene.remove(projectile);
+                        hunters.splice(hIndex, 1);
+                        projectiles.splice(pIndex, 1);
+                        score += 20; // Más puntos por cazadores
+                        document.getElementById('score').innerText = 'Puntuación: ' + score;
+                        console.log('Alien cazador destruido! Puntuación: ' + score);
+                    }
+                });
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();// SIMULACIÓN DE ACTIVOS DE ALTA FIDELIDAD PARA TERMINAL VIP
+function inicializarNodosDeMercado() {
+    const contenedorActivos = new THREE.Group();
+    for (let i = 0; i < 15; i++) {
+        // La altura representa el volumen de transacciones del nodo
+        const volumen = Math.random() * 8 + 2;
+        const esTendenciaAlza = Math.random() > 0.5;
+        const colorVip = esTendenciaAlza ? 0x00FF00 : 0xFFD700; // Verde o Oro Institucional
+
+        const geoPilar = new THREE.BoxGeometry(0.6, volumen, 0.6);
+        const matPilar = new THREE.MeshStandardMaterial({ 
+            color: colorVip,
+            emissive: colorVip,
+            emissiveIntensity: 0.4,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const nodoVisual = new THREE.Mesh(geoPilar, matPilar);
+        // Distribución en el espacio de la terminal
+        nodoVisual.position.set(Math.random() * 50 - 25, volumen / 2, Math.random() * 50 - 25);
+
+        // Anillo de Auditoría (Representa Seguridad Nivel 5)
+        const geoAnillo = new THREE.TorusGeometry(0.75, 0.03, 16, 100);
+        const matAnillo = new THREE.MeshBasicMaterial({ color: 0xFFD700 }); // Dorado VIP
+        const anillo = new THREE.Mesh(geoAnillo, matAnillo);
+        anillo.rotation.x = Math.PI / 2;
+        anillo.position.y = volumen / 2;
+
+        nodoVisual.add(anillo);
+        contenedorActivos.add(nodoVisual);
+    }
+    scene.add(contenedorActivos);
+}
+// Ejecutar la visualización táctica
+inicializarNodosDeMercado();
+
+        // Ajustar tamaño en resize
+        window.addEventListener('resize', () => {
+            camera.aspect = 800 / 400;
+            camera.updateProjectionMatrix();
+            renderer.setSize(800, 400);
+        });
+
+        // Donación
+        function showDonationInfo() {
+            const amount = document.getElementById('amount').value;
+            console.log('Generando QR para amount:', amount);
+            document.getElementById('selectedAmount').textContent = amount;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bitcoin:bc1qsvv0tfcxwljt0paj84wm4xztr48qmv88umsyug?amount=${amount}`;
+            console.log('QR URL:', qrUrl);
+            document.getElementById('qrCode').src = qrUrl;
+            document.getElementById('donationInfo').style.display = 'block';
+        }
+
+        // Copiar dirección BTC
+        function copyAddress() {
+            const address = 'bc1qsvv0tfcxwljt0paj84wm4xztr48qmv88umsyug';
+            navigator.clipboard.writeText(address).then(() => {
+                alert('Dirección copiada al portapapeles!');
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+            });
+        }
+
+        // Abrir enlace de propuesta
+        function openProposal() {
+            window.open('https://github.com/sistematecno816-hue/donaciones-espacioweb/issues/new', '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Donación para Desarrollo de Juego Interactivo - Exploración Cósmica</title>
+    <style>
+        body {
+            background-color: #000011;
+            color: #00FFFF;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: #FFFFFF;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, move 10s linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        @keyframes move {
+            from { transform: translateY(-100vh); }
+            to { transform: translateY(100vh); }
+        }
+        .header {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(45deg, #000033, #001122);
+            border-bottom: 2px solid #00FFFF;
+        }
+        .header h1 {
+            font-size: 3em;
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF;
+        }
+        .header p {
+            font-size: 1.5em;
+            color: #00FF00;
+        }
+        .counter {
+            font-size: 2em;
+            color: #FFFF00;
+            text-shadow: 0 0 10px #FFFF00;
+            margin: 20px 0;
+        }
+        .donate-section {
+            text-align: center;
+            padding: 50px;
+        }
+        .donate-btn {
+            background: linear-gradient(45deg, #00FFFF, #FF00FF);
+            color: #000000;
+            border: none;
+            padding: 30px 60px;
+            font-size: 2em;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00FFFF;
+            margin: 20px;
+            font-weight: bold;
+        }
+        .donate-btn:hover {
+            box-shadow: 0 0 30px #FF00FF;
+        }
+        .address {
+            background: #001122;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #00FFFF;
+            margin: 20px auto;
+            max-width: 600px;
+            word-break: break-all;
+        }
+        .game-section {
+            text-align: center;
+            padding: 50px;
+        }
+        canvas {
+            border: 2px solid #00FFFF;
+            background: #000011;
+            display: block;
+            margin: 0 auto;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #000033;
+            color: #00FFFF;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .header p {
+                font-size: 1.2em;
+            }
+            .counter {
+                font-size: 1.5em;
+            }
+            .donate-btn {
+                padding: 15px 30px;
+                font-size: 1.2em;
+            }
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+            .address {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="header">
+        <h1>🚀 Donación para Desarrollo de Juego Interactivo</h1>
+        <p>Financia la Exploración Cósmica y Ayuda a Crear un Juego Épico</p>
+        <div class="counter">BTC Recaudados: {{ "%.4f"|format(total_donations) }} BTC</div>
+    </div>
+    <div class="donate-section">
+        <h2>¡Únete a la Misión!</h2>
+        <p>Tu donación en Bitcoin nos ayuda a desarrollar juegos interactivos que exploran el cosmos.</p>
+        <button class="donate-btn" onclick="showAddress()">DONAR BTC</button>
+        <div class="address" id="address" style="display: none;">
+            <p>Envía tu donación a esta dirección BTC:</p>
+            <strong>{{ donation_address }}</strong>
+            <p>(Después de enviar, el contador se actualizará automáticamente en futuras versiones)</p>
+        </div>
+    </div>
+    <div class="game-section">
+        <h2>Mini-Juego: Esquiva Asteroides</h2>
+        <p>Usa las flechas para mover la nave y esquivar asteroides. ¡Demuestra tus habilidades!</p>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 Cosmic Game Dev. Todos los derechos reservados. Busca "donacion juego" para encontrar este link.</p>
+    </div>
+
+    <script>
+        // Estrellas dinámicas
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = star.style.height = Math.random() * 4 + 1 + 'px';
+            star.style.animationDelay = Math.random() * 10 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Mini-juego
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let ship = { x: 400, y: 350, width: 20, height: 20 };
+        let asteroids = [];
+        let keys = {};
+
+        function drawShip() {
+            ctx.fillStyle = '#00FFFF';
+            ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
+        }
+
+        function drawAsteroids() {
+            ctx.fillStyle = '#FF4500';
+            asteroids.forEach(ast => {
+                ctx.fillRect(ast.x, ast.y, ast.width, ast.height);
+            });
+        }
+
+        function update() {
+            // Mover nave
+            if (keys['ArrowLeft'] && ship.x > 0) ship.x -= 5;
+            if (keys['ArrowRight'] && ship.x < canvas.width - ship.width) ship.x += 5;
+
+            // Mover asteroides
+            asteroids.forEach(ast => ast.y += 3);
+            asteroids = asteroids.filter(ast => ast.y < canvas.height);
+
+            // Agregar nuevos asteroides
+            if (Math.random() < 0.02) {
+                asteroids.push({ x: Math.random() * canvas.width, y: 0, width: 20, height: 20 });
+            }
+
+            // Colisión
+            asteroids.forEach(ast => {
+                if (ship.x < ast.x + ast.width && ship.x + ship.width > ast.x &&
+                    ship.y < ast.y + ast.height && ship.y + ship.height > ast.y) {
+                    alert('¡Colisión! Reiniciando...');
+                    ship.x = 400;
+                    asteroids = [];
+                }
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawShip();
+            drawAsteroids();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', e => keys[e.key] = true);
+        document.addEventListener('keyup', e => keys[e.key] = false);
+
+        gameLoop();
+
+        function showAddress() {
+            document.getElementById('address').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

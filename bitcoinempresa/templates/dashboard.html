@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Institutional Trading Terminal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle, #0d0d0d 0%, #000000 100%);
+            color: #f0f0f0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #00FF00;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .balance {
+            font-size: 1.5em;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .section h2 {
+            color: #00FF00;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        /* Panel de Donaciones Profesional */
+        .donation-panel {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(184, 134, 11, 0.05) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 24px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(255, 215, 0, 0.15), inset 0 0 60px rgba(255, 215, 0, 0.03);
+        }
+
+        .donation-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .donation-panel h3 {
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 1.4em;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .donation-panel .subtitle {
+            color: #ccc;
+            font-size: 1em;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btc-address-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btc-address-container:hover {
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btc-label {
+            color: #FFD700;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .btc-address {
+            color: #00FF00;
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 1.2em;
+            letter-spacing: 1px;
+            word-break: break-all;
+            padding: 12px;
+            background: rgba(0, 255, 0, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .copy-button {
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            color: #000;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .copy-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, #FFE44D 0%, #DAA520 100%);
+        }
+
+        .copy-button:active {
+            transform: translateY(-1px);
+        }
+
+        .copy-button.copied {
+            background: linear-gradient(135deg, #00FF00 0%, #32CD32 100%);
+            animation: successPulse 0.5s ease;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .qrcode-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .logout a {
+            color: #FF4500;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .logout a:hover {
+            color: #FF6347;
+            text-decoration: underline;
+        }
+
+        input[type="text"] {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+        }
+
+        .border-gold {
+            border: 2px solid rgba(255, 215, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Terminal Institucional de Gestión de Activos</h1>
+        <div class="balance">Capital Operativo: ${{ "%.2f"|format(balance) }} USD</div>
+    </div>
+
+    <div class="container">
+        {% if not acceso_premium %}
+        <div class="section glass-panel">
+            <h2>🔐 Acceso Restringido: Nivel de Seguridad 5</h2>
+            <p>Se requiere una inversión de 7.00 USD para desbloquear la Terminal de Trading Avanzada y el Simulador 3D.</p>
+            <form method="POST" action="{{ url_for('unlock_game') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="text" id="txid" name="txid" placeholder="Ingrese TXID de la transacción" required>
+                <button type="submit">Validar Contrato</button>
+            </form>
+        </div>
+
+        <div class="section glass-panel" style="border-top: 2px solid #FFD700; margin-top: 40px;">
+            <h2 style="font-size: 1.1rem; letter-spacing: 3px;">📋 AUDITORÍA DE OPERACIONES GLOBALES</h2>
+            <div style="background: rgba(0,0,0,0.9); border-radius: 10px; padding: 20px; height: 200px; overflow-y: auto; border: 1px solid #333;">
+                <code style="color: #00FF00; font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.6;">
+                    {% for log in logs %}
+                        <p style="margin: 0 0 5px 0;">> [SYS_AUTH]: {{ log }} <span style="color: #444; float: right;">VERIFIED_NODE_816</span></p>
+                    {% endfor %}
+                </code>
+            </div>
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #FFD700; font-size: 0.75em;">● SISTEMA OPERATIVO CIFRADO</span>
+                <span style="color: #666; font-size: 0.75em;">ÚLTIMA ACTUALIZACIÓN: {{ "now" }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if acceso_premium %}
+        <div class="section glass-panel border-gold">
+            <h2>🚀 Terminal de Colonización Activa</h2>
+            <p>Bienvenido, Inversor. El simulador táctico de exploración está listo para operar.</p>
+            <iframe src="{{ url_for('index') }}" width="100%" height="500px" style="border: 2px solid #FFD700; border-radius: 15px;"></iframe>
+        </div>
+        {% endif %}
+
+        <!-- Panel de Donaciones Profesional -->
+        <div class="donation-panel">
+            <span class="qrcode-icon">💎</span>
+            <h3>Reconocimiento Institucional</h3>
+            <p class="subtitle">Aceptamos aportaciones de mecenazgo para el desarrollo y mantenimiento de esta infraestructura empresarial</p>
+            
+            <div class="btc-address-container">
+                <div class="btc-label">Dirección Bitcoin (BTC)</div>
+                <div class="btc-address" id="btcAddress">bc1qsvv0tfcxwljt0paj84wm4x7tr48qmv88umsyug</div>
+                <button class="copy-button" onclick="copyAddress()" id="copyBtn">
+                    Copiar Dirección
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="logout">
+        <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+    </div>
+
+    <script>
+        function copyAddress() {
+            const address = 'bc1qsvv0tfcxwljt0paj84wm4x7tr48qmv88umsyug';
+            const copyBtn = document.getElementById('copyBtn');
+            
+            navigator.clipboard.writeText(address).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓ Copiado';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                // Fallback para navegadores antiguos
+                const textArea = document.createElement('textarea');
+                textArea.value = address;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓ Copiado';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
