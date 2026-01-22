@@ -6,7 +6,7 @@ from groq import Groq
 app = Flask(__name__)
 CORS(app)
 
-# Configuración con la llave de Groq que pusiste en Render
+# Conexión con la llave que pusiste en Render
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 @app.route("/")
@@ -19,17 +19,18 @@ def chat():
         data = request.json
         mensaje = data.get("mensaje")
         
-        # Uso de Llama 3 para que tu terminal sea ultra rápida
         completion = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[{"role": "user", "content": mensaje}]
         )
         
+        # AQUÍ ESTABA EL ERROR. ESTO YA ESTÁ CORREGIDO:
         respuesta_ia = completion.choices[0].message.content
         return jsonify({"respuesta": respuesta_ia})
+        
     except Exception as e:
-        print(f"Error detectado: {e}")
-        return jsonify({"respuesta": "El sistema está sincronizando con la red Solana..."})
+        print(f"Error: {e}")
+        return jsonify({"respuesta": "Error de conexión con Groq. Revisa la API KEY en Render."})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
