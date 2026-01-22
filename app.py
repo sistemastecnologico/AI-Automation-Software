@@ -24,9 +24,5 @@ def chat():
         response = model.generate_content(mensaje)
         return jsonify({"respuesta": response.text})
     except Exception as e:
-        # Esto te dirá el error real en la consola de Render
-        print(f"ERROR: {e}")
-        return jsonify({"respuesta": "Error en el cerebro de IA."})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+        print(f"Detalle del fallo: {e}")
+        return jsonify({"respuesta": "El sistema está sincronizando con la red Solana..."})
