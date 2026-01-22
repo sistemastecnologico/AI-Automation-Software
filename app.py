@@ -6,7 +6,7 @@ from groq import Groq
 app = Flask(__name__)
 CORS(app)
 
-# Esta línea conecta con la llave gsk_ que me pasaste
+# Configuración con la llave de Groq que pusiste en Render
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 @app.route("/")
@@ -19,7 +19,7 @@ def chat():
         data = request.json
         mensaje = data.get("mensaje")
         
-        # Usamos Llama 3 para que tu terminal de $10,000 sea ultra rápida
+        # Uso de Llama 3 para que tu terminal sea ultra rápida
         completion = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[{"role": "user", "content": mensaje}]
