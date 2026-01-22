@@ -1,49 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Software de Ingeniería IA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLANA ENGINEERING TERMINAL v3.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { background: #050505; color: #0f0; font-family: monospace; padding: 20px; }
-        .card { border: 1px solid #333; padding: 20px; margin-bottom: 20px; background: #111; }
-        #chat-box { height: 250px; overflow-y: auto; background: #000; border: 1px solid #444; padding: 10px; margin-bottom: 10px; }
-        .btn { background: #f7931a; color: white; border: none; padding: 12px; cursor: pointer; width: 100%; font-weight: bold; }
+        :root { --solana-teal: #14F195; --solana-purple: #9945FF; --bg: #050505; }
+        body { background: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', monospace; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .card { background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; }
+        .premium-box { border: 2px solid var(--solana-teal); background: rgba(20, 241, 149, 0.05); text-align: center; }
+        h1, h2 { color: var(--solana-teal); margin-top: 0; font-size: 16px; letter-spacing: 1px; }
+        .balance { font-size: 35px; color: #fff; font-weight: bold; margin: 10px 0; }
+        #chat-box { height: 450px; overflow-y: auto; background: #000; padding: 15px; border: 1px solid #222; margin-bottom: 15px; border-radius: 8px; font-size: 14px; }
+        .input-group { display: flex; gap: 10px; }
+        input { flex-grow: 1; background: #1a1a1a; border: 1px solid #333; color: var(--solana-teal); padding: 12px; border-radius: 6px; outline: none; }
+        .btn { background: var(--solana-purple); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .qr-container { background: white; padding: 10px; width: 150px; height: 150px; margin: 15px auto; border-radius: 8px; }
+        .wallet-addr { font-size: 10px; color: var(--solana-teal); word-break: break-all; background: #000; padding: 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>SISTEMA DE ANÁLISIS PROFESIONAL</h2>
-        <p>BALANCE ACTUAL: <span style="font-size: 20px;">$10,000.00 USD</span></p>
-    </div>
+    <div class="container">
+        <div class="card">
+            <h2>CONSULTORÍA IA & ANÁLISIS DE DATOS</h2>
+            <div id="chat-box"></div>
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="Escribe consulta técnica...">
+                <button class="btn" onclick="enviarChat()">EJECUTAR</button>
+            </div>
+        </div>
 
-    <div class="card">
-        <h2>CONSULTORÍA IA (GEMINI 1.5)</h2>
-        <div id="chat-box"></div>
-        <input type="text" id="userInput" style="width:100%; padding:10px; background:#000; color:#0f0; border:1px solid #444;" placeholder="Escribe aquí...">
-        <button class="btn" onclick="enviarChat()">EJECUTAR CONSULTA TÉCNICA</button>
-    </div>
-
-    <div class="card" style="border-color: #f7931a;">
-        <h2>APOYO AL DESARROLLO (BTC)</h2>
-        <p>Wallet oficial para donaciones:</p>
-        <code style="color: #f7931a; font-size: 14px;">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+        <div class="card premium-box">
+            <h2>PREMIUM & DONACIONES</h2>
+            <p style="font-size: 12px;">Acceso Premium o Apoyo al Proyecto</p>
+            <div class="qr-container" id="qrcode"></div>
+            <p style="font-size: 11px; color: #888;">Red: Solana (SPL) | Activo: USDC/SOL</p>
+            <div class="wallet-addr" id="wallet">FN5LnJbDwC5ySkaUaaYqKFqvL2FsVju9xMsv6tzZGLxp</div>
+            <button class="btn" style="width: 100%; margin-top: 10px; font-size: 12px; background: #333;" onclick="copyAddr()">COPIAR DIRECCIÓN</button>
+            <p id="copyOk" style="display:none; color: var(--solana-teal); font-size: 11px; margin-top: 5px;">¡Copiado!</p>
+            
+            <div style="margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;">
+                <p style="color: #666; font-size: 12px; margin: 0;">Portfolio Balance</p>
+                <div class="balance">$10,000.00</div>
+                <span style="color: var(--solana-teal); font-size: 12px;">PROFIT: +150.0%</span>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Generar QR automáticamente
+        new QRCode(document.getElementById("qrcode"), {
+            text: "FN5LnJbDwC5ySkaUaaYqKFqvL2FsVju9xMsv6tzZGLxp",
+            width: 150,
+            height: 150
+        });
+
         async function enviarChat() {
             const input = document.getElementById("userInput");
             const box = document.getElementById("chat-box");
             if (!input.value) return;
-            box.innerHTML += `<p><b>Tú:</b> ${input.value}</p>`;
-            
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({mensaje: input.value})
-            });
-            const data = await response.json();
-            box.innerHTML += `<p style="color: #f7931a;"><b>IA:</b> ${data.respuesta}</p>`;
+
+            box.innerHTML += `<div style="margin-bottom:12px;"><b>[USER]:</b> ${input.value}</div>`;
+            const val = input.value;
+            input.value = "PROCESANDO...";
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({mensaje: val})
+                });
+                const data = await response.json();
+                box.innerHTML += `<div style="margin-bottom:20px; color:var(--solana-purple);"><b>[IA]:</b> ${data.respuesta}</div>`;
+            } catch (e) {
+                box.innerHTML += `<div style="color:red;">Error de conexión.</div>`;
+            }
             input.value = "";
             box.scrollTop = box.scrollHeight;
+        }
+
+        function copyAddr() {
+            navigator.clipboard.writeText("FN5LnJbDwC5ySkaUaaYqKFqvL2FsVju9xMsv6tzZGLxp");
+            document.getElementById("copyOk").style.display = "block";
+            setTimeout(() => { document.getElementById("copyOk").style.display = "none"; }, 2000);
         }
     </script>
 </body>
