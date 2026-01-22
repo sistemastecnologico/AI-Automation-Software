@@ -1,40 +1,50 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal de Ingeniería e IA - Profesional</title>
+    <title>Software de Ingeniería IA</title>
     <style>
-        body { background: #050505; color: #e0e0e0; font-family: 'Courier New', monospace; padding: 20px; }
-        .container { max-width: 900px; margin: auto; }
-        .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #f7931a; }
-        h1 { color: #f7931a; text-shadow: 0 0 10px rgba(247, 147, 26, 0.3); text-align: center; }
-        .stat { color: #0f0; font-size: 1.5em; font-weight: bold; }
-        #chat-box { height: 300px; overflow-y: auto; background: #000; border: 1px solid #222; padding: 15px; margin-bottom: 10px; color: #aaa; }
-        input[type="text"] { width: 100%; background: #111; border: 1px solid #444; color: #0f0; padding: 12px; border-radius: 4px; box-sizing: border-box; }
-        .btn { background: #f7931a; color: #fff; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; border-radius: 4px; }
-        .btn:hover { background: #e88316; }
+        body { background: #050505; color: #0f0; font-family: monospace; padding: 20px; }
+        .card { border: 1px solid #333; padding: 20px; margin-bottom: 20px; background: #111; }
+        #chat-box { height: 250px; overflow-y: auto; background: #000; border: 1px solid #444; padding: 10px; margin-bottom: 10px; }
+        .btn { background: #f7931a; color: white; border: none; padding: 12px; cursor: pointer; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>SISTEMA DE ANÁLISIS E IA HUMANITARIA</h1>
+    <div class="card">
+        <h2>SISTEMA DE ANÁLISIS PROFESIONAL</h2>
+        <p>BALANCE ACTUAL: <span style="font-size: 20px;">$10,000.00 USD</span></p>
+    </div>
 
-        <div class="card">
-            <h2>Resultados de Análisis de Datos</h2>
-            <p>Estado del Motor: <span style="color: #0f0;">EJECUTANDO</span></p>
-            <p>Profit Calculado: <span class="stat">$1,500.00 USD</span></p>
-            <p>Rendimiento: <span class="stat">150.0%</span></p>
-        </div>
+    <div class="card">
+        <h2>CONSULTORÍA IA (GEMINI 1.5)</h2>
+        <div id="chat-box"></div>
+        <input type="text" id="userInput" style="width:100%; padding:10px; background:#000; color:#0f0; border:1px solid #444;" placeholder="Escribe aquí...">
+        <button class="btn" onclick="enviarChat()">EJECUTAR CONSULTA TÉCNICA</button>
+    </div>
 
-        <div class="card">
-            <h2>Consultoría Técnica de IA</h2>
-            <div id="chat-box"></div>
-            <input type="text" id="userInput" placeholder="Escribe tu consulta técnica o médica aquí...">
-            <button class="btn" onclick="enviarChat()">ENVIAR CONSULTA AL CEREBRO IA</button>
-        </div>
+    <div class="card" style="border-color: #f7931a;">
+        <h2>APOYO AL DESARROLLO (BTC)</h2>
+        <p>Wallet oficial para donaciones:</p>
+        <code style="color: #f7931a; font-size: 14px;">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</code>
+    </div>
 
-        <div class="card" style="border-left: 5px solid #fff;">
-            <h3>Apoyo al Proyecto (BTC)</h3>
-            <p>Si este análisis te fue útil, puedes apoyar el desarrollo aquí:</p>
-            <input type="text" value="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" id="btcAddr" readonly style
+    <script>
+        async function enviarChat() {
+            const input = document.getElementById("userInput");
+            const box = document.getElementById("chat-box");
+            if (!input.value) return;
+            box.innerHTML += `<p><b>Tú:</b> ${input.value}</p>`;
+            
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mensaje: input.value})
+            });
+            const data = await response.json();
+            box.innerHTML += `<p style="color: #f7931a;"><b>IA:</b> ${data.respuesta}</p>`;
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
