@@ -7,13 +7,13 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
-# --- CONFIGURACIÓN DE SEGURIDAD PROFESIONAL ---
-# Esto permite que el login funcione correctamente en Render (HTTPS)
+# --- SEGURIDAD DE NIVEL EMPRESARIAL ---
+# Esto asegura que Google reconozca tu web como segura (HTTPS)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "vault_security_ultra_2026")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "seguridad_maxima_2026")
 CORS(app)
 
-# --- SISTEMA DE IDENTIDAD (OAuth 2.0) ---
+# --- SISTEMA DE IDENTIDAD ---
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -23,7 +23,6 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# --- CEREBRO DE IA (Groq Llama 3.3) ---
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 @app.route("/")
@@ -33,43 +32,31 @@ def index():
 
 @app.route('/login')
 def login():
-    # Redirección segura para el mercado global
+    # El parámetro _external=True es vital para trabajar remoto
     return google.authorize_redirect(url_for('authorize', _external=True))
 
 @app.route('/authorize')
 def authorize():
-    try:
-        token = google.authorize_access_token()
-        user_info = google.parse_id_token(token)
-        session['user'] = user_info['email']
-        return redirect(url_for('index'))
-    except Exception as e:
-        return f"Error en autorización: {str(e)}"
+    token = google.authorize_access_token()
+    user_info = google.parse_id_token(token)
+    session['user'] = user_info['email']
+    return redirect(url_for('index'))
 
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
         mensaje = request.json.get("mensaje")
-        user_email = session.get('user', 'Inversionista_Anonimo')
-        
-        # Lógica de negocio para atraer inversores
-        system_prompt = (
-            f"Eres el Cerebro de una Terminal Financiera de Élite. Usuario: {user_email}. "
-            "Objetivo: Maximizar capital y analizar riesgos de ciberseguridad. "
-            "Portfolio: $10,000.00. Si no hay sesión, invita a activar el 'Modo de Memoria'."
-        )
-
+        user = session.get('user', 'Invitado_Pro')
         completion = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": f"Terminal Financiera Élite. Usuario: {user}. Portfolio: $10,000."},
                 {"role": "user", "content": mensaje}
-            ],
-            temperature=0.5
+            ]
         )
         return jsonify({"respuesta": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"respuesta": f"Alerta: Error de sistema {str(e)}"})
+        return jsonify({"respuesta": f"Error de sistema: {str(e)}"})
 
 @app.route('/logout')
 def logout():
