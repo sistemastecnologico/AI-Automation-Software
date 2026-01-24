@@ -5,93 +5,73 @@ from groq import Groq
 app = Flask(__name__)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-# INFRAESTRUCTURA FINANCIERA GLOBAL
-WALLET_ADRESS = "FN5nJbDwC5ySkaUaaYqKFqvL2FsVju9xMsv6tzZGLxp"
-GOOGLE_CLIENT_ID = "1003655956505-nh7tso7hb4acuk77489pf9p08far0d9u.apps.googleusercontent.com"
+# CONFIGURACIÓN DE ÉLITE
+W_ADDR = "FN5nJbDwC5ySkaUaaYqKFqvL2FsVju9xMsv6tzZGLxp"
+G_ID = "1003655956505-nh7tso7hb4acuk77489pf9p08far0d9u.apps.googleusercontent.com"
 
-HTML_FORGE = f"""
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Quantum AI Forge | Elite Solutions</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-        body {{ background: radial-gradient(circle, #050505 0%, #000 100%); color: #d4af37; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }}
-        .terminal {{ width: 95%; max-width: 1100px; background: rgba(0, 0, 0, 0.95); border: 1px solid #d4af37; border-radius: 40px; padding: 60px; box-shadow: 0 0 150px rgba(212, 175, 55, 0.2); position: relative; }}
-        .glow-text {{ text-shadow: 0 0 25px #d4af37; letter-spacing: 8px; text-transform: uppercase; }}
-        .btn-gold {{ background: linear-gradient(45deg, #d4af37, #f9f295); color: #000; padding: 20px 45px; border: none; border-radius: 15px; cursor: pointer; font-weight: 900; font-size: 1.2em; transition: 0.4s; text-decoration: none; display: inline-block; margin: 20px 0; }}
-        #chat-area {{ height: 350px; overflow-y: auto; background: #080808; border-radius: 25px; padding: 30px; margin-bottom: 25px; border: 1px solid #1a1a1a; color: #fff; font-size: 1.1em; line-height: 1.6; }}
-        input {{ width: 100%; background: #000; border: 1px solid #d4af37; color: #f9f295; padding: 25px; border-radius: 20px; font-size: 1.3em; outline: none; box-sizing: border-box; }}
-        .auth-header {{ position: absolute; top: 30px; left: 40px; }}
-    </style>
-</head>
+# Interfaz simplificada para evitar errores de sintaxis
+UI = f"""
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>CORE SYSTEM | ELITE</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+    :root {{ --n: #00f2ff; --bg: #050505; }}
+    body {{ background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; text-align: center; }}
+    .h {{ height: 40vh; display: flex; flex-direction: column; justify-content: center; background: radial-gradient(circle, #0a192f, #000); border-bottom: 1px solid #333; }}
+    .t {{ width: 90%; max-width: 900px; margin: 20px auto; padding: 20px; background: #111; border-radius: 10px; border: 1px solid #444; }}
+    #c {{ height: 250px; overflow-y: auto; color: var(--n); font-family: monospace; text-align: left; padding: 10px; }}
+    input {{ width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; margin-top: 10px; outline: none; }}
+    .btn {{ padding: 10px 25px; background: var(--n); color: #000; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin: 10px; }}
+</style></head>
 <body>
-    <div class="terminal">
-        <div class="auth-header">
-            <div id="g_id_onload" data-client_id="{GOOGLE_CLIENT_ID}" data-ux_mode="popup" data-callback="handleCredentialResponse"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with" data-size="large"></div>
-        </div>
-        <h1 class="glow-text">QUANTUM AI FORGE</h1>
-        <a href="https://solscan.io/account/{WALLET_ADRESS}" target="_blank" class="btn-gold">PAYMENTS: SOL / USDC (SPL)</a>
-        <div id="chat-area">>> Sistema autenticado. La IA está lista para procesar inversiones y mostrar el CV del creador...</div>
-        <input type="text" id="userInput" placeholder="Escriba 'pago' para ver la wallet o 'CV' para ver trayectoria..." onkeydown="if(event.key==='Enter') execute()">
+    <div style="position:fixed; top:10px; right:10px;">
+        <div id="g_id_onload" data-client_id="{G_ID}" data-callback="hA"></div>
+        <div class="g_id_signin" data-type="icon"></div>
+    </div>
+    <header class="h">
+        <h1 style="letter-spacing:10px;">QUANTUM CORE</h1>
+        <p style="color:gray;">IA INDUSTRIAL • BLOCKCHAIN • SCIENCE</p>
+        <div><a href="https://solscan.io/account/{W_ADDR}" target="_blank" class="btn">BLOCKCHAIN</a></div>
+    </header>
+    <div class="t">
+        <div id="c">>> SISTEMA LISTO.</div>
+        <input type="text" id="i" placeholder="Escriba requerimiento..." onkeydown="if(event.key==='Enter') exe()">
+        <div id="p" style="height:250px; margin-top:20px;"></div>
     </div>
     <script>
-        function handleCredentialResponse(response) {{ console.log("Identidad verificada en la nube"); }}
-        async function execute() {{
-            const input = document.getElementById('userInput');
-            const chat = document.getElementById('chat-area');
-            const val = input.value;
-            if(!val) return;
-            chat.innerHTML += `<div style="color: #d4af37; margin-bottom: 20px;"><b>CLIENTE:</b> ${{val}}</div>`;
-            input.value = '';
-            const response = await fetch('/chat', {{
-                method: 'POST',
-                headers: {{ 'Content-Type': 'application/json' }},
-                body: JSON.stringify({{ mensaje: val }})
-            }});
-            const data = await response.json();
-            chat.innerHTML += `<div style="margin-bottom: 30px;"><b>AI PORTAVOZ:</b> ${{data.respuesta}}</div>`;
-            if(data.qr) chat.innerHTML += `<div style="text-align:center;"><img src="${{data.qr}}" style="width:250px; border: 10px solid #fff; border-radius: 20px; margin: 20px 0;"></div>`;
-            chat.scrollTop = chat.scrollHeight;
+        function hA(r) {{ console.log("OK"); }}
+        Plotly.newPlot('p', [{{ x:[1,2,3,4], y:[10,15,13,17], type:'scatter', line:{{color:'#00f2ff'}} }}], {{ paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{{color:'#fff'}}, margin:{{t:0,b:30,l:30,r:10}} }});
+        async function exe() {{
+            const i=document.getElementById('i'), c=document.getElementById('c'); if(!i.value) return;
+            const m=i.value; i.value=''; c.innerHTML += `<div>> USER: ${{m}}</div>`;
+            const r=await fetch('/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{mensaje:m}})}});
+            const d=await r.json(); c.innerHTML += `<div style="color:#fff;">> AI: ${{d.respuesta}}</div>`;
+            if(d.qr) c.innerHTML += `<img src="${{d.qr}}" style="width:150px; margin-top:10px; border:1px solid var(--n);">`;
+            c.scrollTop=c.scrollHeight;
         }}
     </script>
-</body>
-</html>
+</body></html>
 """
 
 @app.route("/")
 def index():
-    return Response(HTML_FORGE, mimetype='text/html')
+    return Response(UI, mimetype='text/html')
 
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
         data = request.json
         msg = data.get("mensaje", "").lower()
-        
-        system_prompt = (
-            "Eres la voz de un arquitecto de software de élite. "
-            "Tu creador diseña sistemas que valen billones. "
-            f"Aceptamos pagos legales en Solana (SOL) y USDC (SPL) a la dirección: {WALLET_ADRESS}. "
-            "Resalta que el creador es experto en automatización de IA y Web3."
-        )
-        
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": msg}]
-        )
-        res = completion.choices[0].message.content
+        sys = f"IA de élite. Wallet: {W_ADDR}."
+        comp = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role":"system","content":sys},{"role":"user","content":msg}])
+        res = comp.choices[0].message.content
         out = {"respuesta": res}
-
-        if any(x in msg for x in ["pago", "invertir", "cv", "usdc", "solana", "contratar"]):
-            out["qr"] = f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={WALLET_ADRESS}"
-        
+        if any(x in msg for x in ["pago", "contratar", "solana"]):
+            out["qr"] = f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={W_ADDR}"
         return jsonify(out)
     except Exception as e:
-        return jsonify({"respuesta": f"Alerta de sistema: {str(e)}"}), 500
+        return jsonify({"respuesta": f"ERR: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
