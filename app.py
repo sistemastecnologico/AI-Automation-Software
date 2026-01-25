@@ -13,53 +13,48 @@ app = Flask(__name__)
 CORS(app)
 client = Groq(api_key=Config.GROQ_API_KEY)
 
-# INTERFAZ ELITE CON SOLANA PAY INTEGRADO
-HTML_TEMPLATE = """
+# INTERFAZ ELITE - DISEÑO ZAFIRO INSTITUCIONAL
+UI = """
 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>QUANTUM PRIME</title>
 <style>
-    body { background: #050505; color: #eee; font-family: sans-serif; margin:0; display:flex; height:100vh; }
-    .sidebar { width:320px; background:#000; border-right:1px solid #1a1a1a; padding:30px; display:flex; flex-direction:column; }
-    .main { flex:1; padding:40px; background: radial-gradient(circle at top right, #001a33 0%, #050505 80%); display:flex; flex-direction:column; }
-    .card { background:#0d0d0d; border:1px solid #1a1a1a; padding:15px; border-radius:10px; margin-bottom:15px; }
-    .btn { background:#007aff; color:white; border:none; padding:12px; width:100%; border-radius:6px; font-weight:700; cursor:pointer; font-size:10px; text-transform:uppercase; }
-    .pay-link { display:block; text-decoration:none; background:#2775ca; color:white; padding:15px; border-radius:8px; font-weight:800; text-align:center; margin-top:15px; font-size:12px; transition: 0.3s; }
-    .pay-link:hover { background: #1e5ba3; box-shadow: 0 0 15px #2775ca; }
-    #log { flex:1; overflow-y:auto; background:rgba(0,0,0,0.5); padding:20px; border-radius:10px; border:1px solid #1a1a1a; font-family:monospace; font-size:13px; color:#999; }
-    input { width:100%; padding:20px; background:#000; border:1px solid #1a1a1a; color:white; border-radius:10px; margin-top:20px; box-sizing:border-box; outline: none; }
-</style></head>
-<body>
-    <div class="sidebar">
-        <h2 style="color:#007aff; letter-spacing:3px; font-size:14px;">QUANTUM PRIME</h2>
-        <div class="card"><strong>QUANT ARCHITECT</strong><p style="font-size:10px; color:#555;">Institutional DeFi Scaling.</p>
-        <button class="btn" onclick="ask('Analyze SOL liquidity')">Execute</button></div>
-        <div style="margin-top:auto; text-align:center;">
-            <div style="background:white; padding:8px; border-radius:8px; width:130px; margin:0 auto 15px;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=solana:{{addr}}" style="width:100%">
-            </div>
-            <a href="solana:{{addr}}?label=Quantum_Prime_Fee&message=USDC_Retainer_Payment" class="pay-link">PAY WITH USDC (SOLANA)</a>
-        </div>
-    </div>
-    <div class="main">
-        <div id="log">>> SYSTEM SECURE. READY.</div>
-        <input type="text" id="in" placeholder="Enter High-Level Command..." onkeydown="if(event.key==='Enter') send()">
-    </div>
-    <script>
-        async function send() {
-            const i = document.getElementById('in'), l = document.getElementById('log');
-            if(!i.value) return; const m = i.value; i.value = '';
-            l.innerHTML += `<div style="color:#007aff; margin-top:15px;">> ${m}</div>`;
-            const r = await fetch('/api/v1/quantum-core', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: m }) });
-            const d = await r.json();
-            l.innerHTML += `<div style="color:#eee; padding:10px 0; border-left:2px solid #007aff; padding-left:15px;">> ${d.response}</div>`;
-            l.scrollTop = l.scrollHeight;
-        }
-        function ask(t) { document.getElementById('in').value = t; send(); }
-    </script>
-</body></html>
+ body{background:#050505;color:#eee;font-family:sans-serif;margin:0;display:flex;height:100vh}
+ .side{width:320px;background:#000;border-right:1px solid #1a1a1a;padding:30px;display:flex;flex-direction:column}
+ .main{flex:1;padding:40px;background:radial-gradient(circle at top right,#001a33 0%,#050505 80%);display:flex;flex-direction:column}
+ .card{background:#0d0d0d;border:1px solid #1a1a1a;padding:15px;border-radius:10px;margin-bottom:15px}
+ .btn{background:#007aff;color:#fff;border:none;padding:12px;width:100%;border-radius:6px;font-weight:700;cursor:pointer;font-size:10px;text-transform:uppercase}
+ .pay{display:block;text-decoration:none;background:#2775ca;color:#fff;padding:15px;border-radius:8px;font-weight:800;text-align:center;margin-top:15px;font-size:12px}
+ #log{flex:1;overflow-y:auto;background:rgba(0,0,0,.5);padding:20px;border-radius:10px;border:1px solid #1a1a1a;font-family:monospace;font-size:13px;color:#999}
+ input{width:100%;padding:20px;background:#000;border:1px solid #1a1a1a;color:#fff;border-radius:10px;margin-top:20px;box-sizing:border-box}
+</style></head><body>
+<div class="side">
+ <h2 style="color:#007aff;letter-spacing:3px;font-size:14px">QUANTUM PRIME</h2>
+ <div class="card"><strong>FINANCIAL ARCHITECT</strong><p style="font-size:10px;color:#555">DeFi & Institutional Scaling.</p>
+ <button class="btn" onclick="ask('Analyze SOL liquidity')">EXECUTE</button></div>
+ <div style="margin-top:auto;text-align:center">
+  <div style="background:#fff;padding:8px;border-radius:8px;width:130px;margin:0 auto 15px">
+   <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=solana:{{addr}}" style="width:100%">
+  </div>
+  <a href="solana:{{addr}}?label=Quantum_Fee&message=USDC_Solana_Payment" class="pay">PAY WITH USDC (SOLANA)</a>
+ </div>
+</div>
+<div class="main">
+ <div id="log">>> SYSTEM SECURE. READY FOR COMMANDS.</div>
+ <input type="text" id="in" placeholder="Enter Command..." onkeydown="if(event.key==='Enter')send()">
+</div>
+<script>
+ async function send(){
+  const i=document.getElementById('in'),l=document.getElementById('log');if(!i.value)return;const m=i.value;i.value='';
+  l.innerHTML+=`<div style="color:#007aff;margin-top:15px">> ${m}</div>`;
+  const r=await fetch('/api/v1/quantum-core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})});
+  const d=await r.json();l.innerHTML+=`<div style="color:#eee;padding:10px 0;border-left:2px solid #007aff;padding-left:15px">> ${d.response}</div>`;
+  l.scrollTop=l.scrollHeight
+ }
+ function ask(t){document.getElementById('in').value=t;send()}
+</script></body></html>
 """
 
 @app.route("/")
-def index(): return render_template_string(HTML_TEMPLATE, addr=Config.W_ADDR)
+def index(): return render_template_string(UI, addr=Config.W_ADDR)
 
 @app.route("/api/v1/quantum-core", methods=["POST"])
 def quantum_core_engine():
