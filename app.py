@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app)
 client = Groq(api_key=Config.GROQ_API_KEY)
 
-# --- INTERFAZ PREMIUM PARA BILLONARIOS (CÓDIGO BLINDADO) ---
+# --- INTERFAZ ELITE: SOFTWARE & FINANCE ---
 UI = f"""
 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>QUANTUM PRIME | US Institutional</title>
 <style>
@@ -25,7 +25,7 @@ UI = f"""
     .card {{ background:var(--card); border:1px solid var(--border); padding:20px; border-radius:12px; margin-bottom:20px; transition:0.3s; }}
     .card:hover {{ border-color:var(--blue); box-shadow: 0 0 25px rgba(0,122,255,0.1); }}
     .btn {{ background:var(--blue); color:white; border:none; padding:15px; width:100%; border-radius:8px; font-weight:700; cursor:pointer; text-transform:uppercase; font-size:11px; }}
-    /* BOTÓN DE PAGO REPARADO - RED SOLANA SPL */
+    /* BOTÓN DE PAGO REPARADO - USDC SOLANA SPL */
     .pay-btn {{ display:block; text-decoration:none; background:transparent; border:1px solid #00ffa3; color:#00ffa3; padding:16px; border-radius:8px; font-weight:800; text-align:center; margin-top:20px; transition:0.3s; font-size:12px; }}
     .pay-btn:hover {{ background:#00ffa3; color:black; box-shadow:0 0 20px #00ffa3; }}
     #log {{ flex:1; overflow-y:auto; background:rgba(0,0,0,0.4); padding:30px; border-radius:12px; border: 1px solid var(--border); font-family:'SF Mono', monospace; font-size:14px; line-height:1.8; color:#999; }}
@@ -37,12 +37,12 @@ UI = f"""
         <div class="header">System Status: Elite Access</div>
         <div class="card">
             <strong style="color:var(--blue)">FINANCIAL SOFTWARE ARCHITECT</strong>
-            <p style="font-size:12px; color:#555; margin-top:5px;">Institutional-grade DeFi systems & Algorithm scaling.</p>
+            <p style="font-size:12px; color:#555; margin-top:5px;">Sistemas DeFi de grado institucional y escalado de capital.</p>
             <button class="btn" onclick="ask('Analiza la liquidez de SOL y el impacto en el mercado institucional de EE. UU.')">Run Analysis</button>
         </div>
         <div class="card">
             <strong style="color:var(--blue)">AI INFRASTRUCTURE</strong>
-            <p style="font-size:12px; color:#555; margin-top:5px;">Custom LLM solutions for global high-frequency tasks.</p>
+            <p style="font-size:12px; color:#555; margin-top:5px;">Soluciones de LLM personalizadas para tareas de alta frecuencia.</p>
             <button class="btn" onclick="ask('Escala un framework de IA para una plataforma SaaS con 10M de usuarios')">Deploy Core</button>
         </div>
         <div style="margin-top:auto; text-align:center;">
@@ -54,9 +54,9 @@ UI = f"""
     </div>
     <div class="main">
         <div class="disclaimer">
-            NOTICE: Quantum Prime es una IA de alto nivel. Errores técnicos son posibles. Validación humana obligatoria para activos financieros.
+            NOTICE: Quantum Prime es una IA de alto nivel. Validación humana obligatoria para activos financieros y software corporativo.
         </div>
-        <div id="log">>> QUANTUM CORE v4.0 ACTIVE... <br>>> INSTITUTIONAL PORTAL CONNECTED.</div>
+        <div id="log">>> QUANTUM CORE v5.0 ACTIVE... <br>>> INSTITUTIONAL PORTAL CONNECTED.</div>
         <input type="text" id="in" placeholder="Enter High-Level Commands..." onkeydown="if(event.key==='Enter') send()">
     </div>
     <script>
@@ -90,7 +90,7 @@ def quantum_core_engine():
         sys_msg = (
             "Eres QUANTUM PRIME, una IA de élite para inversores billonarios de EE. UU. "
             "Experto en arquitectura de Software, Finanzas y Web3. "
-            "Responde con autoridad técnica. Siempre admite que puedes cometer errores para generar confianza profesional."
+            "Responde con autoridad técnica. Siempre admite que puedes cometer errores para generar confianza."
         )
         comp = client.chat.completions.create(
             model=Config.MODEL_NAME,
